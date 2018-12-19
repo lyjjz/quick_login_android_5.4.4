@@ -4,8 +4,8 @@ sdk技术问题沟通QQ群：609994083</br>
 
 **注意事项：**
 
-1. **认证取号服务必须打开蜂窝数据流量并且手机操作系统给予应用蜂窝数据权限才能使用**
-2. **取号请求过程需要消耗用户少量数据流量（国外漫游时可能会产生额外的费用）**
+1. **获取token和取号服务必须打开数据流量并且手机操作系统给予应用数据权限才能使用**
+2. **取号请求过程需要消耗用户少量数据流量**
 3. **认证取号服务目前支持中国移动2/3/4G和中国电信4G**
 
 ## 1.1. 接入流程
@@ -30,13 +30,7 @@ jar包集成方式：
 
 1. 在Eclipse/AS中建立你的工程。 
 2. 将`*.jar`拷贝到工程的libs目录下，如没有该目录，可新建。
-3. 将sdk所需要的资源文件（anim, drawable, drawable-xxhdpi, layout, values文件）从demo工程res-umc目录下的文件添加到项目工程中
-
-aar包集成方式：
-
-1. 在Eclipse/AS中建立你的工程。 
-2. 将`*.jar`拷贝到工程的libs目录下，如没有该目录，可新建。
-
+3. 将sdk所需要的证书文件 serverPublicKey.pem 拷贝到项目 assets 目录下。
 
 **第三步：开始使用移动认证SDK**
 
@@ -50,6 +44,11 @@ aar包集成方式：
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+<uses-permission android:name="android.permission.RECEIVE_SMS" />
+<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 ```
 
 权限说明：
@@ -61,33 +60,8 @@ aar包集成方式：
 | ACCESS_WIFI_STATE    | 允许程序访问WiFi网络状态信息               |
 | ACCESS_NETWORK_STATE | 获取网络状态，判断是否数据、wifi等         |
 | CHANGE_NETWORK_STATE | 允许程序改变网络连接状态                   |
-
-**[2] 配置授权登录activity**
-
-开发者根据需要配置横竖屏方向：`android:screenOrientation`
-示列代码为`unspecified`（默认值由系统选择显示方向）
-
-```java
-<activity
-    android:name="com.cmic.sso.sdk.activity.OAuthActivity"
-    android:configChanges="orientation|keyboardHidden|screenSize"
-    android:screenOrientation="unspecified"
-    android:launchMode="singleTop">
-</activity>
-<!-- required -->
-<activity
-    android:name="com.cmic.sso.sdk.activity.BufferActivity"
-    android:configChanges="orientation|keyboardHidden|screenSize"
-    android:screenOrientation="unspecified"
-    android:launchMode="singleTop">
-</activity>
-<!-- required -->
-<activity
-    android:name="com.cmic.sso.sdk.activity.LoginAuthActivity"
-    android:configChanges="orientation|keyboardHidden|screenSize"
-    android:screenOrientation="unspecified"
-    android:launchMode="singleTop">
-</activity>
+| CHANGE_WIFI_STATE    | 允许程序改变wifi连接状态                   |
+| READ_EXTERNAL_STORAGE | 允许程序读写文件                   |
 ```
 
 通过以上两个步骤，工程就已经配置完成了。接下来就可以在代码里使用统一认证的SDK进行开发了
