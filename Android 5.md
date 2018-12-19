@@ -15,9 +15,6 @@ sdk技术问题沟通QQ群：609994083</br>
    b.使用欲取号方法提前缓存取号数据（非必要）：
    c.使用AuthHelper中的getTokenImp方法，获取token：
 
-
-应用创建完成后，在能力配置页面上，勾选应用需要接入的能力类型，如一键登录，并配置应用的服务器出口IP地址。（如果在服务端需要用非对称加密方法对一些重要信息进行加密处理，请在能力配置页面填写RSA加密的公钥）
-
 ## 1.2. 开发流程
 
 **第一步：下载SDK及相关文档**
@@ -26,46 +23,32 @@ sdk技术问题沟通QQ群：609994083</br>
 
 **第二步：搭建开发环境**
 
-jar包集成方式：
+1. 将 quick_login_android_**.jar 拷贝到应用工程的libs目录下，如没有该目录，可新建;
+2. 将sdk所需要的证书文件 serverPublicKey.pem 拷贝到项目 assets 目录下。
+3. 将sdk所需要的资源文件(anim, drawable, drawable-xxhdpi, layout, values文件，具体可参考demo工程)
 
-1. 在Eclipse/AS中建立你的工程。 
-2. 将`*.jar`拷贝到工程的libs目录下，如没有该目录，可新建。
-3. 将sdk所需要的证书文件 serverPublicKey.pem 拷贝到项目 assets 目录下。
+## 1.3. 开发流程
 
-**第三步：开始使用移动认证SDK**
-
-**[1] AndroidManifest.xml设置**
-
-添加必要的权限支持: 
+1，配置权限
 
 ```java
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-<uses-permission android:name="android.permission.RECEIVE_SMS" />
-<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
+   <uses‐permission android:name="android.permission.INTERNET" />
+   <uses‐permission android:name="android.permission.READ_PHONE_STATE" />
+   <uses‐permission android:name="android.permission.ACCESS_WIFI_STATE" />
+   <uses‐permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+   <uses‐permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 ```
-
-权限说明：
-
-| 权限                 | 说明                                       |
-| -------------------- | ------------------------------------------ |
-| INTERNET             | 允许应用程序联网，用于访问网关和认证服务器 |
-| READ_PHONE_STATE     | 获取imsi用于判断双卡和换卡                 |
-| ACCESS_WIFI_STATE    | 允许程序访问WiFi网络状态信息               |
-| ACCESS_NETWORK_STATE | 获取网络状态，判断是否数据、wifi等         |
-| CHANGE_NETWORK_STATE | 允许程序改变网络连接状态                   |
-| CHANGE_WIFI_STATE    | 允许程序改变wifi连接状态                   |
-| READ_EXTERNAL_STORAGE | 允许程序读写文件                   |
+2. 配置授权登录activity
+若需要配置短信校验获取token，请参考demo中示例配置;
+开发者根据需要配置横竖屏方向: android:screenOrientation ，示列代码为 unspecified (默认值由系统选择 显示方向)
+```java
+    <!‐‐ required ‐‐>
+    <activity android:name=".activity.SMSAuthActivity"
+                     android:configChanges="orientation|keyboardHidden|screenSize"
+                     android:screenOrientation="unspecified"
+                     android:launchMode="singleTop"/>
 ```
-
 通过以上两个步骤，工程就已经配置完成了。接下来就可以在代码里使用统一认证的SDK进行开发了
-```
 
 **[2] 创建一个AuthnHelper实例**
 
