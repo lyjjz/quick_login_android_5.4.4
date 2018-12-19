@@ -128,22 +128,21 @@ mListener = new TokenListener() {
 
 # 2.  SDK方法说明
 
-## 2.1. 预取号
+# 2.1. 预取号
 
-## 2.1.1 方法描述
+# 2.1.1 方法描述
 使用SDK登录前，可以通过预取号方法提前获取用户信息并缓存。用户使用一键登录时，会优先使用缓存的信息快
 速请求SDK服务端获取 token 和 用户ID(openID) 等信息，提高登录速度。缓存的有效时间是5min并且只能使用一
 次。预取号成功后，如果用户成功进入授权页，但未授权给应用（未点一键登录按钮），并返回到上一级页面，预
-取号缓存将失效，预取号缓存失效后，用户再次使用显式登录时，将使用常规流程获取token信息。注：预取号方
-法仅对显式登录有效。
-注意：预取号前，开发者需提前申请 READ_PHONE_STATE 权限，否则预取号会失败！
-方法调用如下图：
-![](image/2.1.png)
-原型
+取号缓存将失效，预取号缓存失效后，用户再次使用显式登录时，将使用常规流程获取token信息。
+* 注意：预取号前，开发者需提前申请 READ_PHONE_STATE 权限，否则预取号会失败！
+* 方法调用如下图：
+* ![](image/2.1.png)
+* 原型
 ```java
 public void umcLoginPre(int umcLoginPreTimeOut, final TokenListener listener)
 ```
-## 2.1.2 参数说明
+# 2.1.2 参数说明
 | 参数               | 类型             |说明         |
 | ------------------ | --------- |--------------------|
 | umcLoginPreTimeOut | int      |预取号超时时间        |
@@ -152,8 +151,8 @@ public void umcLoginPre(int umcLoginPreTimeOut, final TokenListener listener)
 口，OnGetTokenComplete是该接口中唯一的抽象方法，即
 void OnGetTokenComplete(JSONObject  jsonobj)|
 
-响应参数
-OnGetTokenComplete的参数JSONObject，含义如下：
+* 响应参数
+* OnGetTokenComplete的参数JSONObject，含义如下：
 | 字段               | 类型      |含义         |
 | ------------------ | --------- |--------------------|
 | resultCode | int      |接口返回码，“103000”为成功。具体返回码见4.1 SDK返回码|
@@ -163,7 +162,7 @@ OnGetTokenComplete的参数JSONObject，含义如下：
 ```java
     mAuthnHelper.umcLoginPre(5000, mListener);
 ```
-响应示例
+* 响应示例
 ```java
     {
     "resultCode": "103000",
