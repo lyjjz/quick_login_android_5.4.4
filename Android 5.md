@@ -65,8 +65,9 @@ jar包集成方式：
 ```
 
 通过以上两个步骤，工程就已经配置完成了。接下来就可以在代码里使用统一认证的SDK进行开发了
+```
 
-**[3] 创建一个AuthnHelper实例**
+**[2] 创建一个AuthnHelper实例**
 
 `AuthnHelper`是SDK的功能入口，所有的接口调用都得通过AuthnHelper进行调用。因此，调用SDK，首先需要创建一个AuthnHelper实例
 
@@ -75,13 +76,6 @@ jar包集成方式：
 ```java
 public static AuthnHelper getInstance(Context context)
 ```
-
-**参数说明：**
-
-| 参数    | 类型    | 说明                                               |
-| ------- | ------- | -------------------------------------------------- |
-| context | Context | 调用者的上下文环境，其中activity中this即可以代表。 |
-
 **示例代码：**
 
 ```java
@@ -92,7 +86,16 @@ public void onCreate(Bundle savedInstanceState) {
     mAuthnHelper = AuthnHelper.getInstance(mContext);
     }
 ```
-
+**【3】AuthnHelper初始化**
+AuthnHelper 是SDK的功能入口，实例化后需要初始化功能参数：
+```java
+    //设置是否输出sdk日志
+    mAuthnHelper.setDebugMode(true);
+    //设置sdkId和sdkKey
+    mAuthnHelper.init(Constant.APP_ID, Constant.APP_KEY);
+    //设置超时时间，默认8s，时间单位毫秒
+    mAuthnHelper.setTimeOut(12000);
+```
 **[4] 实现回调**
 
 所有的SDK接口调用，都会传入一个回调，用于接收SDK返回的调用结果。结果以`JsonObject`的形式传递，`TokenListener`的实现示例代码如下：
@@ -123,7 +126,7 @@ mListener = new TokenListener() {
 
 <div STYLE="page-break-after: always;"></div>
 
-# 2. 一键登录功能
+# 2.  SDK方法说明
 
 ## 2.1. 准备工作
 
