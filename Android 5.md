@@ -135,34 +135,43 @@ mListener = new TokenListener() {
 速请求SDK服务端获取 token 和 用户ID(openID) 等信息，提高登录速度。缓存的有效时间是5min并且只能使用一
 次。预取号成功后，如果用户成功进入授权页，但未授权给应用（未点一键登录按钮），并返回到上一级页面，预
 取号缓存将失效，预取号缓存失效后，用户再次使用显式登录时，将使用常规流程获取token信息。
-* 注意：预取号前，开发者需提前申请 READ_PHONE_STATE 权限，否则预取号会失败！
-* 方法调用如下图：
-* ![](image/2.1.png)
-* 原型
+
+注意：预取号前，开发者需提前申请 READ_PHONE_STATE 权限，否则预取号会失败！
+
+方法调用如下图：
+
+![](image/2.1.png)
+
+原型
+
 ```java
 public void umcLoginPre(int umcLoginPreTimeOut, final TokenListener listener)
 ```
+
 # 2.1.2 参数说明
+
 | 参数               | 类型             |说明         |
 | ------------------ | --------- |--------------------|
 | umcLoginPreTimeOut | int      |预取号超时时间        |
-| listener           | TokenListener      |TokenListener为回调监听器，是一个java接口，需要调用者
-自己实现；TokenListener是接口中的认证登录token回调接
-口，OnGetTokenComplete是该接口中唯一的抽象方法，即
-void OnGetTokenComplete(JSONObject  jsonobj)|
+| listener           | TokenListener      |TokenListener为回调监听器，是一个java接口，需要调用者自己实现；TokenListener是接口中的认证登录token回调接口，OnGetTokenComplete是该接口中唯一的抽象方法，即void OnGetTokenComplete(JSONObject  jsonobj)|
 
-* 响应参数
-* OnGetTokenComplete的参数JSONObject，含义如下：
+响应参数
+
+OnGetTokenComplete的参数JSONObject，含义如下：
+
 | 字段               | 类型      |含义         |
 | ------------------ | --------- |--------------------|
 | resultCode | int      |接口返回码，“103000”为成功。具体返回码见4.1 SDK返回码|
-| desc      | boolean   |成功标识，true为成功|
+| desc      | boolean   |成功标识，true为成功           |
 
 ## 2.1.3 请求示例代码
+
 ```java
     mAuthnHelper.umcLoginPre(5000, mListener);
 ```
-* 响应示例
+
+响应示例
+
 ```java
     {
     "resultCode": "103000",
@@ -170,7 +179,39 @@ void OnGetTokenComplete(JSONObject  jsonobj)|
     }
 ```
 
-## 2.3 隐式登录
+# 2.2 隐式登录
+
+# 2.2.1 方法描述
+
+本方法目前只能用于实现本机号码校验功能。开发者通过隐式登录方法，无授权弹窗，可获取到token和
+openID（需在开放平台勾选相关能力），应用服务端凭token向SDK服务端请求校验是否本机号码。隐式取号失败
+后，不支持短信上行和短信验证码二次验证。注：隐式登录返回的token无法通过 获取用户信息接口 换取手机号
+码，只支持通过 本机号码校验接口 校验用户手机号码身份，否则会报错。
+
+注意：隐式登录前，开发者需提前申请 READ_PHONE_STATE 权限，否则会失败！
+
+方法调用逻辑
+
+![](image/2.2.png)
+
+原型
+
+```java
+    public void getTokenImp(final String authType, final TokenListener listener);
+```
+
+# 2.2.2 参数说明
+
+请求参数
+
+| 参数        | 类型             |说明         |
+| ------------| ---------------- |--------------------|
+| authType    | String              |认证类型        |
+| listener    | TokenListener    |TokenListener为回调监听器，是一个java接口，需要调用者自己实现；TokenListener是接口中的认证登录token回调接口，OnGetTokenComplete是该接口中唯一的抽象方法，即void OnGetTokenComplete(JSONObject  jsonobj)  |
+
+
+
+
 
 
 
@@ -185,7 +226,8 @@ void OnGetTokenComplete(JSONObject  jsonobj)|
 
 本方法用于发起取号请求，SDK完成网络判断、蜂窝数据网络切换等操作并缓存凭证scrip。
 
-**取号方法原型：**
+
+取号方法原型：
 
 ```java
 public void getPhoneInfo(final String appId, 
