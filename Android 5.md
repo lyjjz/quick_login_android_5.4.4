@@ -305,8 +305,7 @@ SDK在获取token过程中，用户手机必须在打开数据网络情况下才
 | expandparams | String |可选 |扩展参数 |
 | token | String |必选 |需要解析的凭证值 |
 | sign | String |必选 |当encryptionalgorithm≠"RSA"时，sign = MD5（appid + version + msgid + systemtime + strictcheck + token + appkey（注：“+”号为合并意思，不包含在被加密的字符串中），输出32位大写字母； 当encryptionalgorithm="RSA"，业务端RSA私钥签名（appid+token）, 服务端使用业务端提供的公钥验证签名（公钥可以在开发者社区配置） |
-| encryptionalgorithm | String |可选 |开发者如果需要使用非对称加密算法时，填写“RSA”。（当该值
-不设置为“RSA”时，执行MD5签名校验） |
+| encryptionalgorithm | String |可选 |开发者如果需要使用非对称加密算法时，填写“RSA”。（当该值不设置为“RSA”时，执行MD5签名校验） |
 
 响应参数
 
@@ -403,26 +402,33 @@ SDK在获取token过程中，用户手机必须在打开数据网络情况下才
 | msgId |2  |string  |必选 |对应的请求消息中的msgid   |
 | timestamp |2  |string  |必选 |响应消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165   |
 | appId |2  |string  |必选 |应用ID   |
-| resultCode |2  |string  |必选 |规则参见4.3平台返回码  |
+| resultCode |2  |string  |必选 |规则参见平台返回码  |
 | body |1  |  |必选 |   |
-| resultDesc |2  |String  |否 |描述参见4.3平台返回码   |
-| message |2  |String |否 |接入方预留参数，该参数会透传给通知接口，此参数需urlencode编码  |
+| resultDesc |2  |String  |否 |描述参见平台返回码   |
+| message |2  |String  |否 |接入方预留参数，该参数会透传给通知接口，此参数需urlencode编码  |
+| expandParams |2  |String |否 |扩展参数格式：param1=value1|param2=value2  方式传递，参数以竖线 | 间隔方式传递，此参数需urlencode编码。 |
 
 
 
-## 3.1.4 示例
+## 3.2.4 示例
 
 请求示例
 
 ```java
     {
-    appid = 3000******76;
-    msgid = 335e06a28f064b999d6a25e403991e4c;
-    sign = 213EF8D0CC71548945A83166575DFA68;
-    strictcheck = 0;
-    systemtime = 20180129112955435;
-    token = STsid0000001517196594066OHmZvPMBwn2MkFxwvWkV12JixwuZuyDU;
-    version = "2.0";
+        body =     {
+            openType = 1;
+            phoneNum =0A2050AC434A32DE684745C829B3DE570590683FAA1C9374016EF60390E6CE76;
+            requesterType = 0;
+            sign = 87FCAC97BCF4B0B0D741FE1A85E4DF9603FD301CB3D7100BFB5763CCF61A1488;
+            token = STsid0000001517194515125yghlPllAetv4YXx0v6vW2grV1v0votvD;
+        };
+        header =     {
+            appId = 3000******76;
+            msgId = f11585580266414fbde9f755451fb7a7;
+            timestamp = 20180129105523519;
+            version = "1.0";
+        };
     }
 ```
 
@@ -430,14 +436,20 @@ SDK在获取token过程中，用户手机必须在打开数据网络情况下才
 
 ```java
     {
-    inresponseto = 335e06a28f064b999d6a25e403991e4c;
-    msisdn = 14700000000;
-    resultCode = 103000;
-    systemtime = 20180129112955477;
+        body =     {
+        message = "";
+        resultDesc = "\U662f\U672c\U673a\U53f7\U7801";
+        };
+        header =     {
+        appId = 3000******76;
+        msgId = f11585580266414fbde9f755451fb7a7;
+        resultCode = 000;
+        timestamp = 20180129105523701;
+        };
     }
 ```
 
-
+## 4 返回码说明
 
 
 
