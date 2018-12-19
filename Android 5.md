@@ -8,12 +8,15 @@ sdk技术问题沟通QQ群：609994083</br>
 2. **取号请求过程需要消耗用户少量数据流量**
 3. **认证取号服务目前支持中国移动2/3/4G和中国电信4G**
 
-## 1.1. 总体使用流程
+## 1.1. 接入流程
 
-1，调用sdk方法来获得token，步骤如下：
-   a.构造SDK中认真工具类AuthHelper的对象：
-   b.使用欲取号方法提前缓存取号数据（非必要）：
-   c.使用AuthHelper中的getTokenImp方法，获取token：
+**1.申请appid和appkey**
+
+根据《开发者接入流程文档》，前往中国移动开发者社区（dev.10086.cn)，按照文档要求创建开发者账号并申请appid和appkey，并填写应用的包名和包签名。
+
+**2.申请能力**
+
+应用创建完成后，在能力配置页面上，勾选应用需要接入的能力类型，如一键登录，并配置应用的服务器出口IP地址。（如果在服务端需要用非对称加密方法对一些重要信息进行加密处理，请在能力配置页面填写RSA加密的公钥）
 
 ## 1.2. 开发流程
 
@@ -23,32 +26,46 @@ sdk技术问题沟通QQ群：609994083</br>
 
 **第二步：搭建开发环境**
 
-1. 将 quick_login_android_**.jar 拷贝到应用工程的libs目录下，如没有该目录，可新建;
-2. 将sdk所需要的证书文件 serverPublicKey.pem 拷贝到项目 assets 目录下。
-3. 将sdk所需要的资源文件(anim, drawable, drawable-xxhdpi, layout, values文件，具体可参考demo工程)
+jar包集成方式：
 
-## 1.3. 开发流程
+1. 在Eclipse/AS中建立你的工程。 
+2. 将`*.jar`拷贝到工程的libs目录下，如没有该目录，可新建。
+3. 将sdk所需要的证书文件 serverPublicKey.pem 拷贝到项目 assets 目录下。
 
-1，配置权限
+**第三步：开始使用移动认证SDK**
+
+**[1] AndroidManifest.xml设置**
+
+添加必要的权限支持: 
 
 ```java
-   <uses‐permission android:name="android.permission.INTERNET" />
-   <uses‐permission android:name="android.permission.READ_PHONE_STATE" />
-   <uses‐permission android:name="android.permission.ACCESS_WIFI_STATE" />
-   <uses‐permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-   <uses‐permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+<uses-permission android:name="android.permission.RECEIVE_SMS" />
+<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 ```
-2. 配置授权登录activity
-若需要配置短信校验获取token，请参考demo中示例配置;
-开发者根据需要配置横竖屏方向: android:screenOrientation ，示列代码为 unspecified (默认值由系统选择 显示方向)
-```java
-    <!‐‐ required ‐‐>
-    <activity android:name=".activity.SMSAuthActivity"
-                     android:configChanges="orientation|keyboardHidden|screenSize"
-                     android:screenOrientation="unspecified"
-                     android:launchMode="singleTop"/>
+
+权限说明：
+
+| 权限                 | 说明                                       |
+| -------------------- | ------------------------------------------ |
+| INTERNET             | 允许应用程序联网，用于访问网关和认证服务器 |
+| READ_PHONE_STATE     | 获取imsi用于判断双卡和换卡                 |
+| ACCESS_WIFI_STATE    | 允许程序访问WiFi网络状态信息               |
+| ACCESS_NETWORK_STATE | 获取网络状态，判断是否数据、wifi等         |
+| CHANGE_NETWORK_STATE | 允许程序改变网络连接状态                   |
+| CHANGE_WIFI_STATE    | 允许程序改变wifi连接状态                   |
+| READ_EXTERNAL_STORAGE | 允许程序读写文件                   |
 ```
+
 通过以上两个步骤，工程就已经配置完成了。接下来就可以在代码里使用统一认证的SDK进行开发了
+```
 
 **[2] 创建一个AuthnHelper实例**
 
@@ -109,11 +126,11 @@ mListener = new TokenListener() {
 
 <div STYLE="page-break-after: always;"></div>
 
-# 2.  SDK方法说明
+## 2.  SDK方法说明
 
-# 2.1. 预取号
+## 2.1. 预取号
 
-# 2.1.1 方法描述
+## 2.1.1 方法描述
 使用SDK登录前，可以通过预取号方法提前获取用户信息并缓存。用户使用一键登录时，会优先使用缓存的信息快
 速请求SDK服务端获取 token 和 用户ID(openID) 等信息，提高登录速度。缓存的有效时间是5min并且只能使用一
 次。预取号成功后，如果用户成功进入授权页，但未授权给应用（未点一键登录按钮），并返回到上一级页面，预
@@ -131,7 +148,7 @@ mListener = new TokenListener() {
 public void umcLoginPre(int umcLoginPreTimeOut, final TokenListener listener)
 ```
 
-# 2.1.2 参数说明
+## 2.1.2 参数说明
 
 | 参数               | 类型             |说明         |
 | ------------------ | --------- |--------------------|
@@ -144,7 +161,7 @@ OnGetTokenComplete的参数JSONObject，含义如下：
 
 | 字段               | 类型      |含义         |
 | ------------------ | --------- |--------------------|
-| resultCode | int      |接口返回码，“103000”为成功。具体返回码见4.1 SDK返回码|
+| resultCode | int      |接口返回码，“103000”为成功。具体返回码见 SDK返回码|
 | desc      | boolean   |成功标识，true为成功           |
 
 ## 2.1.3 请求示例代码
@@ -162,9 +179,9 @@ OnGetTokenComplete的参数JSONObject，含义如下：
     }
 ```
 
-# 2.2 隐式登录
+## 2.2 隐式登录
 
-# 2.2.1 方法描述
+## 2.2.1 方法描述
 
 本方法目前只能用于实现本机号码校验功能。开发者通过隐式登录方法，无授权弹窗，可获取到token和
 openID（需在开放平台勾选相关能力），应用服务端凭token向SDK服务端请求校验是否本机号码。隐式取号失败
@@ -183,7 +200,7 @@ openID（需在开放平台勾选相关能力），应用服务端凭token向SDK
     public void getTokenImp(final String authType, final TokenListener listener);
 ```
 
-# 2.2.2 参数说明
+## 2.2.2 参数说明
 
 请求参数
 
@@ -191,6 +208,236 @@ openID（需在开放平台勾选相关能力），应用服务端凭token向SDK
 | ------------| ---------------- |--------------------|
 | authType    | String              |认证类型        |
 | listener    | TokenListener    |TokenListener为回调监听器，是一个java接口，需要调用者自己实现；TokenListener是接口中的认证登录token回调接口，OnGetTokenComplete是该接口中唯一的抽象方法，即void OnGetTokenComplete(JSONObject  jsonobj)  |
+
+响应参数
+
+OnGetTokenComplete的参数JSONObject，含义如下：
+
+| 字段       | 类型      |含义         |
+| -----------| ---------|--------------------|
+| resultCode | int       |接口返回码，“103000”为成功。具体返回码见 SDK返回码|
+| authType  | Int   |登录类型 |
+| authTypeDes  | String   |登录类型中文描述 |
+| selectSim  | String   |手机sim卡槽标识 |
+| securityphone  | String   |手机加密号码 |
+| openId  | String   |用户身份唯一标识（参数需在开放平台勾选相关能力后开放，如果勾选了一键登录能力，使用本方法时，不返回OpenID） |
+| token  | String   |成功返回:临时凭证，token有效期2min，一次有效，同一用户（手机号）10分钟内获取token且未使用的数量不超过30个 |
+
+## 2.2.3 示例
+
+请求示例代码
+
+```java
+    mAuthnHelper.getTokenImp(AuthnHelper.AUTH_TYPE_WAP, mListener);
+```
+
+响应示例代码
+
+```java
+    {
+    "resultCode": "103000",
+    "authType": "2",
+    "authTypeDes": "网关鉴权",
+    "openId": "003JI1Jg1rmApSg6yG0ydUgLWZ4Bnx0rb4wtWLtyDRc0WAWoAUmE",
+    "token": "STsid0000001512438403572hQSEygBwiYc9fIw0vExdI4X3GMkI5UVw",
+    }
+```
+
+## 2.3 设置取号超时
+
+## 2.3.1 方法描述
+
+设置取号超时时间，默认为8秒，应用在预取号、显式登录、隐式登录阶段时，如果需要更改超时时间，可使用该
+方法配置。
+
+```java
+    public void setTimeOut(int timeOut)
+```
+## 2.3.2 参数说明
+
+请求参数
+
+| 参数        | 类型             |说明         |
+| ------------| ---------------- |--------------------|
+| timeOut    | int              |设置超时时间（单位：毫秒）|
+
+响应参数
+
+无
+
+
+
+## 3 平台接口说明
+
+## 3.1 获取用户信息接口
+
+业务平台或服务端携带用户授权成功后的token来调用统一认证服务端获取用户手机号码等信息。注：本接口仅适
+用于5.3.0及以上版本SDK
+
+## 3.1.1 业务流程
+
+SDK在获取token过程中，用户手机必须在打开数据网络情况下才能获取成功，纯wifi环境下会自动跳转到SDK的短
+信验证码页面（如果有配置）或者返回错误码
+
+![](image/3.1.png)
+
+## 3.1.2 接口说明
+
+请求地址：https://www.cmpassport.com/unisdk/rsapi/loginTokenValidate
+
+协议： HTTPS
+
+请求方法： POST+json,Content-type设置为application/json
+
+回调地址：请参考开发者接入流程文档
+
+## 3.1.3 参数说明
+
+请求参数
+
+| 参数    | 类型             |约束 |说明         |
+| --------| ---------------- |----|--------------------|
+| version | String |必选 |填2.0 |
+| msgid | String |必选 |标识请求的随机数即可(1-36位) |
+| systemtime | String |必选 |请求消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
+| strictcheck | String |必选 |暂时填写"0" |
+| appid | String |必选 |业务在统一认证申请的应用id |
+| expandparams | String |可选 |扩展参数 |
+| token | String |必选 |需要解析的凭证值 |
+| sign | String |必选 |当encryptionalgorithm≠"RSA"时，sign = MD5（appid + version + msgid + systemtime + strictcheck + token + appkey（注：“+”号为合并意思，不包含在被加密的字符串中），输出32位大写字母； 当encryptionalgorithm="RSA"，业务端RSA私钥签名（appid+token）, 服务端使用业务端提供的公钥验证签名（公钥可以在开发者社区配置） |
+| encryptionalgorithm | String |可选 |开发者如果需要使用非对称加密算法时，填写“RSA”。（当该值
+不设置为“RSA”时，执行MD5签名校验） |
+
+响应参数
+
+
+| 参数    | 类型             |约束 |说明         |
+| --------| ---------------- |----|--------------------|
+| inresponseto | String |必选 |对应的请求消息中的msgid |
+| systemtime | String |必选 |响应消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
+| resultcode | String |必选 |返回码 |
+| msisdn | String |可选 |表示手机号码 |
+
+## 3.1.4 示例
+
+请求示例
+
+```java
+    {
+    appid = 3000******76;
+    msgid = 335e06a28f064b999d6a25e403991e4c;
+    sign = 213EF8D0CC71548945A83166575DFA68;
+    strictcheck = 0;
+    systemtime = 20180129112955435;
+    token = STsid0000001517196594066OHmZvPMBwn2MkFxwvWkV12JixwuZuyDU;
+    version = "2.0";
+    }
+```
+
+响应示例代码
+
+```java
+    {
+    inresponseto = 335e06a28f064b999d6a25e403991e4c;
+    msisdn = 14700000000;
+    resultCode = 103000;
+    systemtime = 20180129112955477;
+    }
+```
+
+## 3.2 本机号码校验接口
+
+校验用户输入的号码是否本机号码。 应用将手机号码传给统一认证SDK，统一认证SDK向统一认证服务端发起本机
+号码校验请求，统一认证服务端通过网关或者短信上行获取本机手机号码和第三方应用传输的手机号码进行校验，
+返回校验结果。
+
+## 3.2.1 业务流程
+
+SDK在获取token过程中，用户手机必须在打开数据网络情况下才能获取成功，纯wifi环境下会自动跳转到SDK的短
+信验证码页面（如果有配置）或者返回错误码。注：本业务目前仅支持中国移动号码，建议开发者在调用SDK的获
+取token方法前，判断当前用户手机运营商
+
+![](image/3.1.png)
+
+## 3.2.2 接口说明
+
+调用次数说明：本产品属于收费业务，开发者未签订服务合同前，每天总调用次数有限，详情可咨询商务。
+
+请求地址： https://www.cmpassport.com/openapi/rs/tokenValidate
+
+协议： HTTPS
+
+请求方法： POST+json,Content-type设置为application/json
+
+回调地址：请参考开发者接入流程文档
+
+## 3.2.3 参数说明
+
+1、json形式的报文交互必须是标准的json格式；
+
+2、发送时请设置content type为 application/json
+
+请求参数
+
+| 参数    | 类型    |层级 |约束 |说明         |
+| --------| ------ |--- |---- |--------------------|
+| header |  |1 |必选 | |
+| version |string  |2 |必选 |版本号,初始版本号1.0,有升级后续调整 |
+| msgId |string  |2 |必选 |使用UUID标识请求的唯一性 |
+| timestamp |string  |2 |必选 |请求消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
+| appId |string  |2 |必选 |应用ID |
+| body |  |1 |必选 | |
+| openType |string  |2 |否，requestertype字段为0时是 |运营商类型： 1:移动; 2:联通; 3:电信; 0:未知 |
+| requesterType |string  |2 |必选 |请求方类型： 0:APP； 1:WAP |
+| message |string  |2 |否 |接入方预留参数，该参数会透传给通知接口，此参数需urlencode编码 |
+| expandParams |string  |2 |否 |扩展参数格式：param1=value1|param2=value2  方式传递，参数以竖线 | 间隔方式传递，此参数需urlencode编码。 |
+| phoneNum |string  |2 |必选 |待校验的手机号码的64位sha256值，字母大写。（手机号码 + appKey + timestamp， “+”号为合并意思）（注：建议开发者对用户输入的手机号码的格式进行校验，增加校验通过的概率） |
+| token |string  |2 |必选 |身份标识，字符串形式的token |
+| sign |string  |2 |必选 |签名，HMACSHA256( appId +     msgId + phonNum + timestamp + token + version)，输出64位大写字母 （注：“+”号为合并意思，不包含在被加密的字符串中,appkey为秘钥, 参数名做自然排序（Java是用TreeMap进行的自然排序）） |
+
+响应参数
+
+| 参数    |层级 | 类型  |约束 |说明         |
+| --------| ---|----- |----- |--------------------|
+| header |1  |  |必选 |   |
+| msgId |2  |string  |必选 |对应的请求消息中的msgid   |
+| timestamp |2  |string  |必选 |响应消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165   |
+| appId |2  |string  |必选 |应用ID   |
+| resultCode |2  |string  |必选 |规则参见4.3平台返回码  |
+| body |1  |  |必选 |   |
+| resultDesc |2  |String  |否 |描述参见4.3平台返回码   |
+| message |2  |String |否 |接入方预留参数，该参数会透传给通知接口，此参数需urlencode编码  |
+
+
+
+## 3.1.4 示例
+
+请求示例
+
+```java
+    {
+    appid = 3000******76;
+    msgid = 335e06a28f064b999d6a25e403991e4c;
+    sign = 213EF8D0CC71548945A83166575DFA68;
+    strictcheck = 0;
+    systemtime = 20180129112955435;
+    token = STsid0000001517196594066OHmZvPMBwn2MkFxwvWkV12JixwuZuyDU;
+    version = "2.0";
+    }
+```
+
+响应示例代码
+
+```java
+    {
+    inresponseto = 335e06a28f064b999d6a25e403991e4c;
+    msisdn = 14700000000;
+    resultCode = 103000;
+    systemtime = 20180129112955477;
+    }
+```
+
+
 
 
 
