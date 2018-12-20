@@ -192,7 +192,7 @@ openID（需在开放平台勾选相关能力），应用服务端凭token向SDK
 
 方法调用逻辑
 
-![](image/2.2.png)
+![](image/2.1.png)
 
 原型
 
