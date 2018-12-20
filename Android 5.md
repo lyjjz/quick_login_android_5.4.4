@@ -265,6 +265,69 @@ OnGetTokenComplete的参数JSONObject，含义如下：
 
 无
 
+## 2.4 sim卡快捷登录
+
+## 2.4.1 方法描述
+
+如果取号失败（登录失败，这个延迟时间开发者可以控制，默认2s），开发者可以选跳转SIM快捷登录页面和短信验证界面（sdk提供调用接口，布局界面由开发者实现）;
+当用户使用快捷登录时，sim盾平台会向手机号对应手机发送指令，该手机会弹窗提示用户是否同意授权登录，选确定后，发送请求的app手机会生成token。
+
+注意：用户确认授权登录至多1分钟等待处理，否则会失败！
+
+方法调用逻辑
+
+![](image/2.4.png)
+
+原型
+
+```java
+    public void simQuickLogin( int delayTime, String phoneNum,  TokenListener listener);
+```
+
+## 2.4.2 参数说明
+
+请求参数
+
+| 参数        | 类型             |说明         |
+| ------------| ---------------- |--------------------|
+| delayTime    | int              |指定超时时间       |
+| phoneNum    | String              |输入授权的手机号       |
+| listener    | TokenListener    |TokenListener为回调监听器，是一个java接口，需要调用者自己实现；TokenListener是接口中的认证登录token回调接口，OnGetTokenComplete是该接口中唯一的抽象方法，即void OnGetTokenComplete(JSONObject  jsonobj)  |
+
+响应参数
+
+OnGetTokenComplete的参数JSONObject，含义如下：
+
+| 字段       | 类型      |含义         |
+| -----------| ---------|--------------------|
+| resultCode | int       |接口返回码，“103000”为成功。具体返回码见 SDK返回码|
+| authType  | Int   |登录类型 |
+| authTypeDes  | String   |登录类型中文描述 |
+| selectSim  | String   |手机sim卡槽标识 |
+| securityphone  | String   |手机加密号码 |
+| openId  | String   |用户身份唯一标识（参数需在开放平台勾选相关能力后开放，如果勾选了一键登录能力，使用本方法时，不返回OpenID） |
+| token  | String   |成功返回:临时凭证，token有效期2min，一次有效，同一用户（手机号）10分钟内获取token且未使用的数量不超过30个 |
+
+## 2.4.3 示例
+
+请求示例代码
+
+```java
+    mAuthnHelper.simQuickLogin(60000,mPhoneNum, mListener);
+```
+
+响应示例代码
+
+```java
+    {
+    "resultCode": "103000",
+    "authType": "8",
+    "authTypeDes": "sim快捷登录",
+    "openId": "003JI1Jg1rmApSg6yG0ydUgLWZ4Bnx0rb4wtWLtyDRc0WAWoAUmE",
+    "token": "STsid0000001512438403572hQSEygBwiYc9fIw0vExdI4X3GMkI5UVw",
+    }
+```
+
 
 
 ## 3 平台接口说明
@@ -449,6 +512,18 @@ SDK在获取token过程中，用户手机必须在打开数据网络情况下才
     }
 ```
 
+## 3.3  使用短信验证码（可选）
+
+SDK提供短信验证码作为网关取号的补充功能，短验功能只有在网关取号失败时才能使用。
+
+**注意：**
+
+1. 目前短信验证码只支持移动和电信手机号码
+2. 无网络时，不提供短验服务
+3. 未获取`READ_PHONE_STATE`授权时，不提供短验服务
+
+
+
 ## 4 返回码说明
 
 ## 4.1 SDK返回码
@@ -556,190 +631,4 @@ AuthnHelper.AUTH_TYPE_DYNAMIC_SMS参数；iOS，短信验证码开关设为NO）
 Android 5.x操作系统普遍存在wifi切数据网络通道延时问题，导致取号超时
 
 
-
-
-## 2.4. 使用短信验证码（可选）
-
-SDK提供短信验证码作为网关取号的补充功能，短验功能只有在网关取号失败时才能使用。
-
-**注意：**
-
-1. 目前短信验证码只支持移动和电信手机号码
-2. 无网络时，不提供短验服务
-3. 未获取`READ_PHONE_STATE`授权时，不提供短验服务
-
-**短信验证码开关原型：**
-
-```java
-public void SMSAuthOn(boolean on) 
-```
-
-**参数说明：**
-
-| 字段 | 类型    | 含义                                                       |
-| ---- | ------- | ---------------------------------------------------------- |
-| on   | boolean | true:允许使用短信验证码</br>false（默认）:不使用短信验证码 |
-
-**短信验证使用场景（SMSAuthOn打开前提）：**
-
-一、开发者调用2.5中的loginAuth授权请求方法失败时，自动跳转到短信验证码页面；
-
-二、开发者在授权页面切换，其中
-
-“切换账号”按钮隐藏时，无法在授权页面跳转到短验页面；
-
-“切换账号”按钮显示时，
-
-1. 当SMSAuthOn设置为打开时，点击“切换账号”，跳转到SDK短验
-2. 当SMSAuthOn设置为关闭时，点击“切换账号”，SDK将返回200060返回码，应用根据该返回码自行实现页面的跳转。
-
-![](image/sms_logic.png)
-
-
-
-
-## 2.7. 获取手机号码（服务端）
-
-开发者获取token后，需要将token传递到应用服务器，由应用服务器发起获取用户手机号接口的调用。
-
-调用本接口，必须保证：
-
-1. token在有效期内。（2分钟）
-2. token还未使用过。
-3. 应用服务器出口IP地址在开发者社区中配置正确。
-4. 如果使用RSA加密，确保应用的公钥在开发者社区正确填写。
-
-**接口说明：**
-
-请求地址：https://www.cmpassport.com/unisdk/rsapi/loginTokenValidate
-
-协议： HTTPS 
-
-请求方法： POST+json,Content-type设置为application/json
-
-**参数说明：**
-
-1、json形式的报文交互必须是标准的json格式
-
-2、发送时请设置content type为 application/json
-
-3、参数类型都是String
-
-**请求参数**
-
-| 参数                | 是否必填 | 说明                                                         |
-| :------------------ | :------: | :----------------------------------------------------------- |
-| version             |    是    | 填2.0                                                        |
-| msgid               |    是    | 标识请求的随机数即可(1-36位)                                 |
-| systemtime          |    是    | 请求消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
-| strictcheck         |    是    | 暂时填写"0"，填写“1”时，将对服务器IP白名单进行强校验（后续将强制要求IP强校验） |
-| appid               |    是    | 业务在统一认证申请的应用id                                   |
-| expandparams        |    否    | 扩展参数                                                     |
-| token               |    是    | 需要解析的凭证值。                                           |
-| sign                |    是    | 当**encryptionalgorithm≠"RSA"**时，sign = MD5(appid + version + msgid + systemtime + strictcheck + token + appkey)（注：“+”号为合并意思，不包含在被加密的字符串中），输出32位大写字母；</br>当**encryptionalgorithm="RSA"**，业务端RSA私钥签名（appid+token）, 服务端使用业务端提供的公钥验证签名（公钥可以在开发者社区配置）。 |
-| encryptionalgorithm |    否    | 推荐使用。开发者如果需要使用非对称加密算法时，填写“RSA”。（当该值不设置为“RSA”时，执行MD5签名校验） |
-
-**响应参数**
-
-| 参数         | 说明                                                         |
-| ------------ | ------------------------------------------------------------ |
-| inresponseto | 对应的请求消息中的msgid                                      |
-| systemtime   | 响应消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
-| resultcode   | 返回码                                                       |
-| msisdn       | 表示手机号码，如果加密方式为RSA，应用需要用私钥进行解密      |
-
-## 2.8. 本机号码校验（服务端）
-
-开发者获取token后，需要将token传递到应用服务器，由应用服务器发起本机号码校验接口的调用。
-
-调用本接口，必须保证：
-
-1. token在有效期内（2分钟）
-2. token还未使用过
-3. 应用服务器出口IP地址在开发者社区中配置正确。
-
-对于本机号码校验，需要注意：
-
-1. 本产品属于收费业务，开发者未签订服务合同前，每天总调用次数有限，详情可咨询商务。
-2. 签订合同后，将不在提供每天免费的测试次数。
-
-**接口说明：**
-
-请求地址： https://www.cmpassport.com/openapi/rs/tokenValidate
-
-协议： HTTPS
-
-请求方法： POST+json,Content-type设置为application/json
-
-**参数说明：**
-
-1、json形式的报文交互必须是标准的json格式
-
-2、发送时请设置content type为 application/json
-
-3、参数类型都是String
-
-**请求参数**
-
-| 参数          | 层级  | 是否必填                     | 说明                                                         |
-| ------------- | ----- | ---------------------------- | ------------------------------------------------------------ |
-| **header**    | **1** | 是                           |                                                              |
-| version       | 2     | 是                           | 版本号,初始版本号1.0,有升级后续调整                          |
-| msgId         | 2     | 是                           | 使用UUID标识请求的唯一性                                     |
-| timestamp     | 2     | 是                           | 请求消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
-| appId         | 2     | 是                           | 应用ID                                                       |
-| **body**      | **1** | 是                           |                                                              |
-| openType      | 2     | 否，requestertype字段为0时是 | 运营商类型：</br>1:移动;</br>2:联通;</br>3:电信;</br>0:未知  |
-| requesterType | 2     | 是                           | 请求方类型：</br>0:APP；</br>1:WAP                           |
-| message       | 2     | 否                           | 接入方预留参数，该参数会透传给通知接口，此参数需urlencode编码 |
-| expandParams  | 2     | 否                           | 扩展参数格式：param1=value1\|param2=value2  方式传递，参数以竖线 \| 间隔方式传递，此参数需urlencode编码。 |
-| keyType       | 2     | 否                           | 手机号码加密方式：</br>0:默认phonenum采用sha256加密，sign采用HMACSHA256算法</br>1:RSA加密（暂未支持）</br>（注：keyType=1时，phonenum和sign均使用RSA，keyType不填或非1、0时按keyType=0处理） |
-| phoneNum      | 2     | 是                           | 待校验的手机号码的64位sha256值，字母大写。（手机号码 + appKey + timestamp， “+”号为合并意思）（注：建议开发者对用户输入的手机号码的格式进行校验，增加校验通过的概率） |
-| token         | 2     | 是                           | 身份标识，字符串形式的token                                  |
-| sign          | 2     | 是                           | 签名，HMACSHA256( appId + msgId + phonNum + timestamp + token + version)，输出64位大写字母 （注：“+”号为合并意思，不包含在被加密的字符串中，appkey为秘钥, 参数名做自然排序（Java是用TreeMap进行的自然排序）） |
-
-**响应参数**
-
-| 参数         | 层级  | 说明                                                         |
-| ------------ | ----- | :----------------------------------------------------------- |
-| **header**   | **1** |                                                              |
-| msgId        | 2     | 对应的请求消息中的msgid                                      |
-| timestamp    | 2     | 响应消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
-| appId        | 2     | 应用ID                                                       |
-| resultCode   | 2     | 平台返回码                                                   |
-| **body**     | **1** |                                                              |
-| resultDesc   | 2     | 平台返回码                                                   |
-| message      | 2     | 接入方预留参数，该参数会透传给通知接口，此参数需urlencode编码 |
-| accessToken  | 2     | 使用短验辅助服务的凭证，当resultCode返回为001时，并且该appid在开发者社区配置了短验辅助功能时返回该参数。accessToken有效时间为5min，一次有效。 |
-| expandParams | 2     | 扩展参数格式：param1=value1\|param2=value2  方式传递，参数以竖线 \| 间隔方式传递，此参数需urlencode编码。 |
-
-**请求示例代码：**
-
-```
-{
-    body =     {
-        openType = 1;
-        phoneNum =0A2050AC434A32DE684745C829B3DE570590683FAA1C9374016EF60390E6CE76;
-        requesterType = 0;
-        sign = 87FCAC97BCF4B0B0D741FE1A85E4DF9603FD301CB3D7100BFB5763CCF61A1488;
-        token = STsid0000001517194515125yghlPllAetv4YXx0v6vW2grV1v0votvD;
-    };
-    header =     {
-        appId = 3000******76;
-        msgId = f11585580266414fbde9f755451fb7a7;
-        timestamp = 20180129105523519;
-        version = "1.0";
-    };
-}
-```
-
 <div STYLE="page-break-after: always;"></div>
-
-<div STYLE="page-break-after: always;"></div>
-
-
-
-
-
-
-
