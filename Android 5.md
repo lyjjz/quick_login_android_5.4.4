@@ -415,6 +415,7 @@ public void getTokenSms(final String phoneNum, final String authCode, final Toke
 ## 3.2.1 参数说明
 
 a.获取短信验证码
+
 | 参数               | 类型             |说明         |
 | ------------------ | --------- |--------------------|
 | phoneNum | String      |手机号        |
@@ -430,6 +431,7 @@ OnGetTokenComplete的参数JSONObject，含义如下：
 | authTypeDes  | String   |登录类型中文描述 |
 
 b.短信验证码登录
+
 | 参数               | 类型             |说明         |
 | ------------------ | --------- |--------------------|
 | phoneNum | String      |手机号        |
