@@ -274,52 +274,115 @@ SDK在获取token过程中，用户手机必须在打开数据网络情况下才
 
 请求参数
 
-| 参数    | 类型             |约束 |说明         |
-| --------| ---------------- |----|--------------------|
-| version | String |必选 |填2.0 |
-| msgid | String |必选 |标识请求的随机数即可(1-36位) |
-| systemtime | String |必选 |请求消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
-| strictcheck | String |必选 |暂时填写"0" |
-| appid | String |必选 |业务在统一认证申请的应用id |
-| expandparams | String |可选 |扩展参数 |
-| token | String |必选 |需要解析的凭证值 |
-| sign | String |必选 |当encryptionalgorithm≠"RSA"时，sign = MD5（appid + version + msgid + systemtime + strictcheck + token + appkey（注：“+”号为合并意思，不包含在被加密的字符串中），输出32位大写字母； 当encryptionalgorithm="RSA"，业务端RSA私钥签名（appid+token）, 服务端使用业务端提供的公钥验证签名（公钥可以在开发者社区配置） |
-| encryptionalgorithm | String |可选 |开发者如果需要使用非对称加密算法时，填写“RSA”。（当该值不设置为“RSA”时，执行MD5签名校验） |
+| 参数    |约束 |层级  |参数类型   |说明          |
+| --------| ----|------|---------|---------------|
+| header |必选 |1 |   |     |
+| version |必选 |2 |string |填1.0     |
+| msgid |必选 |2 |string |标识请求的随机数即可(1-36位)    |
+| systemtime |必选 |2 |string |请求消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
+| id |必选 |2 |string |业务或应用集成统一认证的标识，需提前申请，申请指南见附录B即：sourceId或appId。临时凭证校验时，id必须为sourceid |
+| idtype |必选 |2 |string |id类型：0：sourceid 1:appid。临时凭证校验时，idtype必须为0 |
+| apptype |必选 |2 |string |参见“渠道编码定义”1 BOSS 2 web 3 wap 4 pc客户端 5 手机客户端 |
+| userip |可选 |2 |string |客户端用户来源ip  |
+| message |可选 |2 |string |接入方预留参数，该参数会透传给通知接口，此参数需urlencode编码 |
+| expandparams |可选 |2 |string |业务扩展参数，多个参数以`|`分隔，每个参数长度为3字节，例如：300`|`301。300: sdk签发的token和临时凭证校验成功后返uid |
+| sign |必选 |2 |string |签名，MD5(apptype  +id+idtype+key+msgid+ systemtime+token+version)，输出32位小写字母+数字,其中，key为appkey或sourcekey,由idtype确定。id为sourceid且sourcekey不存在的情况，key为空，建议通过认证平台申请sourcekey以提高安全性。（注：“+”号为合并意思，不包含在被加密的字符串中,appkey为秘钥, 参数名做自然排序（Java是用TreeMap进行的自然排序））可参考附录D的示例代码Sign.java |
+| body |必选 |2 |1 |  |
+| token |必选 |2 |string |需要解析的凭证值  |
+| userInformation |可选 |2 |string |加密的浏览器指纹，智能认证jssdk token校验时必填，其他token校验时不填  |
+
 
 响应参数
 
+| 参数    |约束 |层级  |参数类型   |说明          |
+| --------| ----|------|---------|---------------|
+| header |必选 |1 |   |     |
+| version |必选 |2 |string |1.0有升级时调整 |
+| inresponseto |必选 |2 |string |对应的请求消息中的msgid |
+| systemtime |必选 |2 |string |响应消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165  |
+| resultcode |必选 |2 |string |返回码，返回码对应说明见附录A |
+| resultdesc |可选 |2 |string |返回结果描述信息 |
+| body |必选 |1 | |  |
+| usessionid |可选 |2 |string 基于uid的token校验成功后，该字段为uid |
+| openid |可选 |2 |string |用户对外身份标识  |
+| msisdnmask |可选 |2 |string |手机号码掩码，如：138****1234 |
+| passid |必选 |2 |string |用户统一账号的系统标识（校验融合sdk token时，为可选）  |
+| msisdn |可选 |2 |string |手机号码经过AES加密后的结果,密钥为appkey或sourceKey经md5转换后的值。如果appkey或sourceKey不存在，则返回明文，建议通过认证平台申请sourceKey以提高安全性。可使用参考附录E中的deCodeAES()进行解密 |
+| email |可选 |2 |string |表示邮箱地址 |
+| loginid |必选 |2 |string |咪咕token校验时必选。用户登录时，输入的用户名，可以有三种类型：0：手机号码 1：邮箱 2：普通用户名（字母数字组合）3：第三方账号唯一标识，QQ/微信为unoinid，其他为openid|
+| loginidtype |可选 |2 |string |登录使用的用户标识：0：手机号码1：邮箱2：普通用户名（字母数字组合）3: 第三方账号（QQ/微信/支付宝/新浪微博）|
+| msisdntype |可选 |2 |string |手机号码的归属运营商：0：中国移动 1：中国电信2：中国联通99：未知的异网手机号码 |
+| province |可选 |2 |string |用户所属省份(暂无)  |
+| authtype |可选 |2 |string |认证方式,具体取值参考附录C  |
+| authtime |可选 |2 |string |统一认证平台认证用户的时间 |
+| relateToAndPassport |可选 |2 |string |是否已经关联到统一账号，暂无用处 |
+| relateToMiguPassport |可选 |2 |string |用户在本业务平台的账号是否已经关联到咪咕账号，若已关联，与咪咕账号中手机/邮箱相同的业务账号不能再登录。咪咕token校验时必选0：已经关联1：未关联 |
+| implicit |可选 |2 |string |是否为隐式咪咕账号，咪咕token校验时必选0：不是1：是 |
+| fromid |可选 |2 |string |来源sourceid或appid类型0：sourceid 1:appid |
+| fromidtype |可选 |2 |string |来源sourceid或appid类型0：sourceid 1:appid |
+| toid |可选 |2 |string |目标sourceid或appid（即签发token的sourceid或appid） |
+| fromidtype |可选 |2 |string |来源sourceid或appid类型0：sourceid 1:appid |
+| toid |可选 |2 |string |目标sourceid或appid（即签发token的sourceid或appid） |
+| toidtype |可选 |2 |string |目标sourceid或appid类型0：sourceid 1:appid |
+| message |可选 |2 |string |接入方预留参数，此参数需urlencode编码 |
+| userid |可选 |2 |string |临时凭证校验响应字段，用户内部标识 |
+| nickname |可选 |2 |string |昵称 |
+|lastchangetime |可选 |2 |string |临时凭证校验响应字段，通行证信息最后一次更新时间，精确到毫秒，共17位，格式：20121227180001165 |
+| exresparams |可选 |2 |string |响应扩展参数，多个参数以`|`分隔，顺序与请求扩展参数对应，例如：key1=value1`|`key2=value2`|`uid=... |
 
-| 参数    | 类型             |约束 |说明         |
-| --------| ---------------- |----|--------------------|
-| inresponseto | String |必选 |对应的请求消息中的msgid |
-| systemtime | String |必选 |响应消息发送的系统时间，精确到毫秒，共17位，格式：20121227180001165 |
-| resultcode | String |必选 |返回码 |
-| msisdn | String |可选 |表示手机号码 |
 
 ## 3.1.4 示例
 
 请求示例
 
-```java
-    {
-    appid = 3000******76;
-    msgid = 335e06a28f064b999d6a25e403991e4c;
-    sign = 213EF8D0CC71548945A83166575DFA68;
-    strictcheck = 0;
-    systemtime = 20180129112955435;
-    token = STsid0000001517196594066OHmZvPMBwn2MkFxwvWkV12JixwuZuyDU;
-    version = "2.0";
-    }
 ```
+   {
+	"header": {
+		"version": "1.0",
+		"msgid": "1533635625757",
+		"systemtime": "20180807175345757",
+		"id": "012005",
+		"idtype": "0",
+		"apptype": "3",
+		"sign": "dc090d3c24959d42b56691ba424dfb65"
+	},
+	"body": {
+		"token": "8484010001320200344E6A5A4551554D784F444E474E446C434E446779517A673340687474703A2F2F3139322E3136382E31322E3233363A393039302F0300040353EA68040006313030303030FF00203A020A143C6703D7D0530953C760744C7D61F5F7B546F12BC17D65254878748C"
+	}
+}
+
+```
+
+备注：示例中的token不会过期，可重复使用，可以用于验证调用流程。正式的token只能使用一次。但使用示例中的token时，无法通过传递扩展参数获取uid。
 
 响应示例代码
 
-```java
+```
     {
-    inresponseto = 335e06a28f064b999d6a25e403991e4c;
-    msisdn = 14700000000;
-    resultCode = 103000;
-    systemtime = 20180129112955477;
+    "header": {
+		"inresponseto": "1533635625757",
+		"resultcode": "103000",
+		"systemtime": "20180807175344658",
+		"version": "1.0",
+		"resultdesc": "成功(103000)"
+	},
+	"body": {
+		"msisdntype": "0",
+		"toid": "012005",
+		"passid": "000000000",
+		"fromid": "100000",
+		"lastactivetime": "",
+		"authtype": "WAPGW",
+		"toidtype": "0",
+		"fromidtype": "0",
+		"usessionid": "NjZEQUMxODNGNDlCNDgyQzg3@http://192.168.12.236:9090/@06",
+		"msisdnmask": "188****0000",
+		"loginidtype": "0",
+		"authtime": "2018-08-07 17:53:44",
+		"msisdn": "nvBSIzynspuOFuLZYX4nJQ==",
+		"relateToAndPassport": "1"
+	}
+
     }
 ```
 
