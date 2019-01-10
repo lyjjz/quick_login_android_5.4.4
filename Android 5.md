@@ -285,7 +285,7 @@ SDK在获取token过程中，用户手机必须在打开数据网络情况下才
 | message |可选 |2 |string |接入方预留参数，该参数会透传给通知接口，此参数需urlencode编码 |
 | expandparams |可选 |2 |string |业务扩展参数，多个参数以 竖线 分隔，每个参数长度为3字节 sdk签发的token和临时凭证校验成功后返uid |
 | sign |必选 |2 |string |签名，MD5(apptype  +id+idtype+key+msgid+ systemtime+token+version)，输出32位小写字母+数字,其中，key为appkey或sourcekey,由idtype确定。id为sourceid且sourcekey不存在的情况，key为空，建议通过认证平台申请sourcekey以提高安全性。（注：“+”号为合并意思，不包含在被加密的字符串中,appkey为秘钥, 参数名做自然排序（Java是用TreeMap进行的自然排序））可参考附录D的示例代码Sign.java |
-| body |必选 |2 |1 |  |
+| body |必选 |1 | |  |
 | token |必选 |2 |string |需要解析的凭证值  |
 | userInformation |可选 |2 |string |加密的浏览器指纹，智能认证jssdk token校验时必填，其他token校验时不填  |
 
