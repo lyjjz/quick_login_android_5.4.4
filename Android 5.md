@@ -25,8 +25,8 @@ jar包集成方式：
 
 添加必要的权限支持: 
 
-```java
-oid.permission.INTERNET" />
+```
+   <uses‐permission android:name="android.permission.INTERNET" />
    <uses‐permission android:name="android.permission.READ_PHONE_STATE" />
    <uses‐permission android:name="android.permission.ACCESS_WIFI_STATE" />
    <uses‐permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -35,7 +35,7 @@ oid.permission.INTERNET" />
 2. 配置授权登录activity
 若需要配置短信校验获取token，请参考demo中示例配置;
 开发者根据需要配置横竖屏方向: android:screenOrientation ，示列代码为 unspecified (默认值由系统选择 显示方向)
-```java
+```
     <!‐‐ required ‐‐>
     <activity android:name=".activity.SMSAuthActivity"
                      android:configChanges="orientation|keyboardHidden|screenSize"
