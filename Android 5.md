@@ -35,6 +35,7 @@ jar包集成方式：
 2. 配置授权登录activity
 若需要配置短信校验获取token，请参考demo中示例配置;
 开发者根据需要配置横竖屏方向: android:screenOrientation ，示列代码为 unspecified (默认值由系统选择 显示方向)
+
 ```
     <!‐‐ required ‐‐>
     <activity android:name=".activity.SMSAuthActivity"
@@ -44,7 +45,7 @@ jar包集成方式：
 ```
 
 通过以上两个步骤，工程就已经配置完成了。接下来就可以在代码里使用统一认证的SDK进行开发了
-```
+
 
 **[2] 创建一个AuthnHelper实例**
 
@@ -52,12 +53,12 @@ jar包集成方式：
 
 **方法原型：**
 
-```java
+```
 public static AuthnHelper getInstance(Context context)
 ```
 **示例代码：**
 
-```java
+```
 public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mContext = this;    
@@ -65,9 +66,11 @@ public void onCreate(Bundle savedInstanceState) {
     mAuthnHelper = AuthnHelper.getInstance(mContext);
     }
 ```
+
 **【3】AuthnHelper初始化**
+
 AuthnHelper 是SDK的功能入口，实例化后需要初始化功能参数：
-```java
+```
     //设置是否输出sdk日志
     mAuthnHelper.setDebugMode(true);
     //设置sdkId和sdkKey
@@ -75,11 +78,12 @@ AuthnHelper 是SDK的功能入口，实例化后需要初始化功能参数：
     //设置超时时间，默认8s，时间单位毫秒
     mAuthnHelper.setTimeOut(12000);
 ```
+
 **[4] 实现回调**
 
 所有的SDK接口调用，都会传入一个回调，用于接收SDK返回的调用结果。结果以`JsonObject`的形式传递，`TokenListener`的实现示例代码如下：
 
-```java
+```
 mListener = new TokenListener() {
     @Override
     public void onGetTokenComplete(JSONObject jObj) {
@@ -92,6 +96,7 @@ mListener = new TokenListener() {
         }
     }
 };
+
 ```
 
 **[5] 混淆策略**
@@ -123,7 +128,7 @@ mListener = new TokenListener() {
 
 原型
 
-```java
+```
 public void umcLoginPre(int umcLoginPreTimeOut, final TokenListener listener)
 ```
 
@@ -145,13 +150,13 @@ OnGetTokenComplete的参数JSONObject，含义如下：
 
 ## 2.1.3 请求示例代码
 
-```java
+```
     mAuthnHelper.umcLoginPre(5000, mListener);
 ```
 
 响应示例
 
-```java
+```
     {
     "resultCode": "103000",
     "desc": "true",
@@ -174,7 +179,7 @@ openID，应用服务端凭token向SDK服务端请求校验。
 
 原型
 
-```java
+```
     public void getTokenImp(final String authType, final TokenListener listener);
 ```
 
@@ -205,13 +210,13 @@ OnGetTokenComplete的参数JSONObject，含义如下：
 
 请求示例代码
 
-```java
+```
     mAuthnHelper.getTokenImp(AuthnHelper.AUTH_TYPE_WAP, mListener);
 ```
 
 响应示例代码
 
-```java
+```
     {
     "resultCode": "103000",
     "authType": "2",
@@ -228,7 +233,7 @@ OnGetTokenComplete的参数JSONObject，含义如下：
 设置取号超时时间，默认为8秒，应用在预取号、显式登录、隐式登录阶段时，如果需要更改超时时间，可使用该
 方法配置。
 
-```java
+```
     public void setTimeOut(int timeOut)
 ```
 ## 2.3.2 参数说明
